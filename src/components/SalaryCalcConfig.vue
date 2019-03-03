@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="save">
+    <div>
         <h1>{{name}}</h1>
         <details>
             <summary>Formulas</summary>
@@ -107,8 +107,7 @@
                 </label>
             </div>
         </fieldset>
-        <button type="submit" class="btn btn-primary">Save</button>
-    </form>
+    </div>
 </template>
 
 <script lang="ts">

@@ -138,7 +138,7 @@
     margin-top: 20px;
     display: flex;
     align-items: center;
-    &>div {
+    &>div, &>form {
       margin: auto;
     }
   }
@@ -157,5 +157,8 @@
     background-color: var(--light);
     padding: 10px 20px;
     margin-bottom: 15px;
+  }
+  .full-width {
+    width: 100%;
   }
 </style>
