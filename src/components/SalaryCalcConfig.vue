@@ -81,7 +81,7 @@
                         <td><input type="number" v-model="level.maxStock" :min="level.minStock" :required="level.position" v-if="level.position"/></td>
                         <td><input type="number" v-model="level.max" :min="level.start" :required="isHighestLevel(level)" v-if="isHighestLevel(level)"/></td>
                         <td><input type="checkbox" v-model="level.fixedSalary" v-if="level.position"/></td>
-                        <td><button type="button" class="btn btn-link text-danger">Remove</button></td>
+                        <td><button type="button" class="btn btn-link text-danger" @click="remove(level)">Remove</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -193,6 +193,9 @@
         }
         resort() {
             this.levels = this.levels.sort((a, b) => ((a.start || 0) - (b.start || 0)))
+        }
+        remove(level) {
+            this.levels.splice(this.levels.indexOf(level), 1)
         }
 
         get codeWeightsPretty() { return formatCode(codeWeightsRaw)}
