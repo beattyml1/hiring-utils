@@ -11,11 +11,14 @@
 <script>
     import ToggleItem from './ToggleItem'
     export default {
-        props: ['value', 'items', 'small' ],
+        props: ['value', 'small' ],
         components: { ToggleItem },
-        data: () => ({
-            selectedKey: this.value
-        }),
+        data() {
+            return {
+                selectedKey: this.value,
+                items: []
+            }
+        },
         created() {
             this.items = this.$children;
         },

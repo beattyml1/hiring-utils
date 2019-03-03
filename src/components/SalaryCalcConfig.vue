@@ -142,7 +142,10 @@
             vestingYears() { this.$emit('input', this.model); },
             defaultMarket() { this.$emit('input', this.model); },
             defaultStock() { this.$emit('input', this.model); },
-            value() { Object.assign(this, this.value) },
+            value() {
+                this.keys = this.value ? Object.keys(this.value) : this.keys||[]
+                Object.assign(this, this.value)
+            },
         }
     })
     export default class SalaryCalcConfig extends Vue implements ConfigModel {
@@ -158,13 +161,15 @@
         valuation: number = defaults.valuation;
         vestingYears: number = defaults.vestingYears;
         defaultPosition: number|null = defaults.defaultPosition;
-        uid: string = '';
+        publicId: string;
+        keys: string[];
         @State user: User;
 
         data() {
             return {
                 ...(this.value),
                 interval: 15000,
+                keys: this.value ? Object.keys(this.value) : []
             }
         }
         addLevel() {
@@ -184,12 +189,6 @@
             return level.start == Math.max(...this.levels.map(x => x.start||0))
         }
 
-        save() {
-            if (this.uid)
-                userData().collection(`/calcs`).doc(this.uid).set(this.model)
-            else
-                userData().collection(`/calcs`).add(this.model).then(docRef => `/build/calc/${docRef.id}`).then(this.$router.push)
-        }
         resort() {
             this.levels = this.levels.sort((a, b) => ((a.start || 0) - (b.start || 0)))
         }
@@ -201,35 +200,12 @@
         get stockCode() {return  formatCode(stockCodeRaw)}
 
         get model() {
-            let {
-                uid,
-                defaultMarket,
-                defaultStock,
-                experienceWeight,
-                levels,
-                name,
-                positionWeight,
-                showStock,
-                stockDiscount,
-                valuation,
-                vestingYears,
-                defaultPosition,
-            } = this.$data;
-            return {
-                uid,
-                defaultMarket,
-                defaultStock,
-                experienceWeight,
-                levels,
-                name,
-                positionWeight,
-                showStock,
-                stockDiscount,
-                valuation,
-                vestingYears,
-                defaultPosition,
-            }
+            return this.keys.reduce((model, key) => ({
+                ...model,
+                [key]: this.$data[key]
+            }), {})
         }
+
     }
 </script>
 

@@ -73,14 +73,14 @@
   }
 
   #calc {
-    margin: 30px auto;
+    margin: 0 auto;
     max-width: 500px;
   }
 
   #builder {
     max-width: 1024px;
     font-family: helvetica, arial, sansserif;
-    margin: 30px auto;
+    margin: 0 auto;
   }
 
   h1 {

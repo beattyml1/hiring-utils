@@ -11,7 +11,7 @@ service cloud.firestore {
         return x.ownerUser == request.auth.uid && isSignedIn();
     }
     function isSharedWithCurrentUser(x) {
-        return x.sharedWithEmail == request.auth.email;
+        return x.sharedWithEmail == request.auth.email && request.auth.email;
     }
     function doesNotChangeOwner() {
         return request.resource.data.ownerUser == resource.data.ownerUser;

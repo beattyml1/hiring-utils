@@ -19,18 +19,14 @@ export interface CombinedLevel extends PositionLevel, ExperienceLevel {
     experience: boolean;
 }
 
-export interface EmailShare {
-    email: string;
-    shareId: string;
-}
-
-export interface SharingInfo {
-    public: string;
-    shares: EmailShare[];
+export interface Share {
+    id?: string;
+    public?: boolean;
+    email?: string;
+    deleted?: boolean;
 }
 
 export interface ConfigModel {
-    uid: string;
     name: string;
     levels: CombinedLevel[];
     showStock: boolean;
@@ -42,11 +38,12 @@ export interface ConfigModel {
     defaultMarket: number;
     defaultStock: number;
     defaultPosition: number|null;
-    sharingInfo?: SharingInfo|null;
+    publicId: string;
+    emails: string[]
 }
 
-export const defaultSharingInfo = () => ({ public: '', shares: []});
-export const defaultShare = () => ({ email: '', shareId: ''});
+export const defaultShare = () => ({ email: '', public: false});
+export const share = ({email, isPublic}) => ({ email: email || '', isPublic: isPublic || false});
 
 export const defaultLevel = () => ({
     name: '',
@@ -55,7 +52,7 @@ export const defaultLevel = () => ({
     maxStock: null,
     experience: true,
     position: true,
-    max: null
+    max: null,
 });
 
 export function defaultConfigModel(): ConfigModel {
@@ -81,7 +78,7 @@ export function defaultConfigModel(): ConfigModel {
         defaultPosition: null,
         showStock: true,
         name: '',
-        uid: '',
-        sharingInfo: defaultSharingInfo()
+        publicId: '',
+        emails: []
     };
 }

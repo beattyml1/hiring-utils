@@ -52,7 +52,7 @@
         }
         calcs: ConfigModel[] = [];
         mounted() {
-            userData().collection('calcs').get().then(result => this.calcs = result.docs.map(d => ({ ...d.data(), uid: d.id } as any)))
+            userData().collection('calcs').get().then(result => this.calcs = result.docs.map(d => ({ ...d.data(), id: d.id } as any)))
         }
     }
 </script>

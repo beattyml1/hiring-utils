@@ -12,6 +12,7 @@ export default class SalaryCalcBasePage extends BaseComponent {
         super();
     }
     config: ConfigModel|null = null;
+    id: string;
     get market() { return this.config && this.config.defaultMarket; }
     get position() { return this.config && this.config.defaultPosition; }
     get stock() { return this.config && this.config.defaultStock; }
@@ -23,12 +24,4 @@ export default class SalaryCalcBasePage extends BaseComponent {
     get positionWeight() { return this.config && this.config.positionWeight; }
     get stockDiscount() { return this.config && this.config.stockDiscount; }
     get hasConfig() { return !!this.config; }
-    async mounted() {
-        if (this.$route.params.id !== 'new') {
-            const doc = await userData().collection('calcs').doc(this.$route.params.id).get();
-            this.config = { ...doc.data(), uid: doc.id.toString()  } as any;
-        } else {
-            this.config = defaultConfigModel();
-        }
-    }
 }

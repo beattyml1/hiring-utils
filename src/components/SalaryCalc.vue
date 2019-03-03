@@ -59,16 +59,16 @@
     export default class SalaryCalc extends Vue {
 
         @Prop(String) title: string
-        @Prop(Number) valuation: number
+        @Prop([Number,String]) valuation: number
         @Prop(Array)  levels: PositionLevel[]
         @Prop(Array)  expLevels: ExperienceLevel[]
-        @Prop(Number) experienceCompInitial: number
-        @Prop(Number) positionCompInitial: number
-        @Prop(Number) stockInitial: number
-        @Prop(Number) vestingYears: number
-        @Prop(Number) experienceWeight: number
-        @Prop(Number) positionWeight: number
-        @Prop(Number) stockDiscount: number
+        @Prop([Number,String]) experienceCompInitial: number
+        @Prop([Number,String]) positionCompInitial: number
+        @Prop([Number,String]) stockInitial: number
+        @Prop([Number,String]) vestingYears: number
+        @Prop([Number,String]) experienceWeight: number
+        @Prop([Number,String]) positionWeight: number
+        @Prop([Number,String]) stockDiscount: number
 
         // @Watch('experienceCompInitial')
         // onExpCompChange() { this.market = this.experienceCompInitial; }
