@@ -1,5 +1,5 @@
 
-import {ConfigModel, defualtConfigModel} from "../types/config";
+import {ConfigModel, defaultConfigModel} from "../types/config";
 import Vue from 'vue';
 import Component from "vue-class-component";
 import {db, userData} from "../services/firebase";
@@ -28,7 +28,7 @@ export default class SalaryCalcBasePage extends BaseComponent {
             const doc = await userData().collection('calcs').doc(this.$route.params.id).get();
             this.config = { ...doc.data(), uid: doc.id.toString()  } as any;
         } else {
-            this.config = defualtConfigModel();
+            this.config = defaultConfigModel();
         }
     }
 }

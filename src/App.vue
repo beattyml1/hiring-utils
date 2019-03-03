@@ -28,7 +28,7 @@
     import 'bootstrap/dist/css/bootstrap.min.css';
     import SalaryCalcConfig from './components/SalaryCalcConfig.vue';
     import SalaryCalc from './components/SalaryCalc.vue';
-    import {ConfigModel, defualtConfigModel} from './types/config';
+    import {ConfigModel, defaultConfigModel} from './types/config';
     import Component from 'vue-class-component'
     import SalaryCalcBuildPage from './pages/SalaryCalcBuildPage.vue'
     import {logout,login} from './store/actions/auth';
@@ -131,7 +131,8 @@
     }
   }
   nav {
-    box-shadow: gray 0 5px 5px;
+    box-shadow: rgba(128, 128, 128, 0.55) 0 2px 2px;
+    background-color: white;
   }
   #main-container {
     margin-top: 20px;
@@ -140,5 +141,21 @@
     &>div {
       margin: auto;
     }
+  }
+  code {
+    white-space: pre;
+    .keyword {
+      color: orange;
+    }
+    .operator {
+      color: gray;
+    }
+    tab-size: 4;
+    display: block;
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: var(--light);
+    padding: 10px 20px;
+    margin-bottom: 15px;
   }
 </style>

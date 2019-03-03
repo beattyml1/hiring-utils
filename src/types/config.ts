@@ -19,6 +19,16 @@ export interface CombinedLevel extends PositionLevel, ExperienceLevel {
     experience: boolean;
 }
 
+export interface EmailShare {
+    email: string;
+    shareId: string;
+}
+
+export interface SharingInfo {
+    public: string;
+    shares: EmailShare[];
+}
+
 export interface ConfigModel {
     uid: string;
     name: string;
@@ -32,9 +42,23 @@ export interface ConfigModel {
     defaultMarket: number;
     defaultStock: number;
     defaultPosition: number|null;
+    sharingInfo?: SharingInfo|null;
 }
 
-export function defualtConfigModel(): ConfigModel {
+export const defaultSharingInfo = () => ({ public: '', shares: []});
+export const defaultShare = () => ({ email: '', shareId: ''});
+
+export const defaultLevel = () => ({
+    name: '',
+    start: null,
+    minStock: null,
+    maxStock: null,
+    experience: true,
+    position: true,
+    max: null
+});
+
+export function defaultConfigModel(): ConfigModel {
     const stockDiscount = .1;
     const experienceWeight = 2.5;
     const positionWeight = 1;
@@ -42,20 +66,22 @@ export function defualtConfigModel(): ConfigModel {
     const vestingYears = 4;
     const defaultMarket = 0;
     const defaultStock = 0;
-    const defaultLevel = { start: null, minStock: null, maxStock: null, experience: true, position: true, max: null };
     return {
         levels: [
-            { name: 'Intern', ...defaultLevel,  fixedSalary: true},
-            { name: 'Junior', ...defaultLevel },
-            { name: 'Experienced', ...defaultLevel },
-            { name: 'Senior', ...defaultLevel },
-            { name: 'Lead', ...defaultLevel },
-            { name: 'Director', ...defaultLevel },
+            { ...defaultLevel(), name: 'Intern', experience: false,  fixedSalary: true},
+            { ...defaultLevel(), name: 'Junior', experience: false },
+            { ...defaultLevel(), name: 'No Exp. (Bootcamp)', position: false },
+            { ...defaultLevel(), name: 'No Exp. (4 Year)', position: false },
+            { ...defaultLevel(), name: 'Experienced' },
+            { ...defaultLevel(), name: 'Senior' },
+            { ...defaultLevel(), name: 'Lead' },
+            { ...defaultLevel(), name: 'Director' },
         ],
         stockDiscount, experienceWeight, positionWeight, valuation, vestingYears, defaultMarket, defaultStock,
         defaultPosition: null,
         showStock: true,
         name: '',
-        uid: ''
+        uid: '',
+        sharingInfo: defaultSharingInfo()
     };
 }

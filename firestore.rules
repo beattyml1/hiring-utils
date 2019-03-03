@@ -1,8 +1,32 @@
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
     function isCurrentUser(user) {
         return request.auth.uid != null && request.auth.uid == user;
     }
+    function isOwnedByCurrentUser(x) {
+        return x.ownerUser == request.auth.uid && isSignedIn();
+    }
+    function isSharedWithCurrentUser(x) {
+        return x.sharedWithEmail == request.auth.email;
+    }
+    function doesNotChangeOwner() {
+        return request.resource.data.ownerUser == resource.data.ownerUser;
+    }
+    function doesNotChangeShared() {
+        return request.resource.data.sharedWithEmail == resource.data.sharedWithEmail;
+    }
+
+    match /shared-calcs/{calc} {
+        allow read: if isOwnedByCurrentUser(resource.data) || resource.public || isSharedWithCurrentUser(resource.data);
+        allow create: if isOwnedByCurrentUser(request.resource.data);
+        allow update: if isOwnedByCurrentUser(request.resource.data) && isOwnedByCurrentUser(resource.data);
+        allow delete: if isOwnedByCurrentUser(request.resource.data) && isOwnedByCurrentUser(resource.data);
+    }
+
     allow read, write: if false;
     match /users/{user} {
       allow read, write: if isCurrentUser(user);
@@ -10,12 +34,19 @@ service cloud.firestore {
       	allow read;
         allow write: if isCurrentUser(user);
       }
-      match /candidates/{candidate}{
-      	match /salaryBlinds/{blind} {
-      	    allow read: if false;
-        	allow write: if isCurrentUser(user);
+    }
+
+    match /salaryBlinds/{blind} {
+        function employerNumberNotChanged() {
+            return request.resource.data.employerNumber == resource.data.employerNumber;
         }
-      }
+        function validChangeByCandidate() {
+            return isSharedWithCurrentUser(resource.data) && doesNotChangeShared() && employerNumberNotChanged();
+        }
+        allow read: if false;
+        allow create: if isOwnedByCurrentUser(resource.data);
+        allow update: if doesNotChangeOwner() && (isOwnedByCurrentUser(resource.data) || validChangeByCandidate());
+        allow delete: if isOwnedByCurrentUser(resource.data);
     }
   }
 }

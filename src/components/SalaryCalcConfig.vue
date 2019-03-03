@@ -1,12 +1,19 @@
 <template>
     <form @submit.prevent="save">
         <h1>{{name}}</h1>
+        <details>
+            <summary>Formulas</summary>
+            <code v-html="codeWeightsPretty">
+            </code>
+            <code v-html="stockCode">
+            </code>
+        </details>
         <div class="row">
             <label class="col col-sm-12 col-md-4">
                 Name
                 <input type="text" v-model="name" required class="form-control"/>
             </label>
-            <label class="col col-sm-12 col-md-4 align-bottom">
+            <label class="col col-sm-12 col-md-4 align-bottom" hidden>
                 <input type="checkbox" v-model="showStock" />
                 Show Stock
             </label>
@@ -70,10 +77,10 @@
                         <td><input type="checkbox" v-model="level.experience"/></td>
                         <td width="25%"><input type="text" v-model="level.name" required/></td>
                         <td><input type="number" v-model="level.start" min="35000" required @blur="resort"/></td>
-                        <td><input type="number" v-model="level.minStock" :max="level.maxStock" :required="level.position"/></td>
-                        <td><input type="number" v-model="level.maxStock" :min="level.minStock" :required="level.position"/></td>
-                        <td><input type="number" v-model="level.max" :min="level.start" :required="isHighestLevel(level)"/></td>
-                        <td><input type="checkbox" v-model="level.fixedSalary"/></td>
+                        <td><input type="number" v-model="level.minStock" :max="level.maxStock" :required="level.position" v-if="level.position"/></td>
+                        <td><input type="number" v-model="level.maxStock" :min="level.minStock" :required="level.position" v-if="level.position"/></td>
+                        <td><input type="number" v-model="level.max" :min="level.start" :required="isHighestLevel(level)" v-if="isHighestLevel(level)"/></td>
+                        <td><input type="checkbox" v-model="level.fixedSalary" v-if="level.position"/></td>
                         <td><button type="button" class="btn btn-link text-danger">Remove</button></td>
                     </tr>
                 </tbody>
@@ -100,33 +107,42 @@
                 </label>
             </div>
         </fieldset>
-        <input type="submit" class="btn btn-primary" value="Save"/>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </template>
 
 <script lang="ts">
-    import {db, userData} from '../services/firebase'
+    import {userData} from '../services/firebase'
     import Component from "vue-class-component";
     import {Prop} from "vue-property-decorator";
     import Vue from 'vue';
-    import {CombinedLevel, ConfigModel, defualtConfigModel} from "../types/config";
-    import {router} from "../router";
+    import {CombinedLevel, ConfigModel, defaultConfigModel} from "../types/config";
     import {State} from "vuex-class";
     import {User} from "../types/User";
-    const defaults = defualtConfigModel();
+    import {formatCode} from "../services/codeFormatting";
+
+    const defaults = defaultConfigModel();
+
+    const stockCodeRaw = `salary = compensation - stock * (1 - stock_discount)`
+
+    const codeWeightsRaw =
+`compensation =
+\tposition.starting_comp if position.fixed_rate else
+\texperience_market_comp if experience_market_comp > position.starting_comp else
+\t(experience_market_comp * experience_weight + position.starting_comp * position_weight) \n\t/ (experience_weight + position_weight)`
 
     @Component({
         name: "SalaryCalcConfig",
         watch: {
-            levels() { this.$emit('input', this.$data); },
-            showStock() { this.$emit('input', this.$data); },
-            stockDiscount() { this.$emit('input', this.$data); },
-            experienceWeight() { this.$emit('input', this.$data); },
-            positionWeight() { this.$emit('input', this.$data); },
-            valuation() { this.$emit('input', this.$data); },
-            vestingYears() { this.$emit('input', this.$data); },
-            defaultMarket() { this.$emit('input', this.$data); },
-            defaultStock() { this.$emit('input', this.$data); },
+            levels() { this.$emit('input', this.model); },
+            showStock() { this.$emit('input', this.model); },
+            stockDiscount() { this.$emit('input', this.model); },
+            experienceWeight() { this.$emit('input', this.model); },
+            positionWeight() { this.$emit('input', this.model); },
+            valuation() { this.$emit('input', this.model); },
+            vestingYears() { this.$emit('input', this.model); },
+            defaultMarket() { this.$emit('input', this.model); },
+            defaultStock() { this.$emit('input', this.model); },
             value() { Object.assign(this, this.value) },
         }
     })
@@ -149,7 +165,7 @@
         data() {
             return {
                 ...(this.value),
-                interval: 15000
+                interval: 15000,
             }
         }
         addLevel() {
@@ -166,18 +182,22 @@
         }
 
         isHighestLevel(level) {
-            return level.start === Math.max(...this.levels.map(x => x.start||0))
+            return level.start == Math.max(...this.levels.map(x => x.start||0))
         }
 
         save() {
             if (this.uid)
-                userData().collection(`/calcs`).doc(this.uid).set(this.$data)
+                userData().collection(`/calcs`).doc(this.uid).set(this.model)
             else
-                userData().collection(`/calcs`).add(this.$data).then(docRef => `/build/calc/${docRef.id}`).then(this.$router.push)
+                userData().collection(`/calcs`).add(this.model).then(docRef => `/build/calc/${docRef.id}`).then(this.$router.push)
         }
         resort() {
             this.levels = this.levels.sort((a, b) => ((a.start || 0) - (b.start || 0)))
         }
+
+        get codeWeightsPretty() { return formatCode(codeWeightsRaw)}
+        get stockCode() {return  formatCode(stockCodeRaw)}
+
         get model() {
             let {
                 uid,
@@ -224,6 +244,10 @@
             td, th{
                 padding: .4em;
             }
+        }
+        button[type=submit] {
+            display: block;
+            width: 100%;
         }
     }
 </style>
