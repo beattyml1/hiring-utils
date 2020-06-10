@@ -9,6 +9,7 @@ export const router = new VueRouter({
         { path: '/', component: DashboardPage },
         { path: '/build/calc/:id', component: SalaryCalcBuildPage },
         { path: '/calc/:id', component: SalaryCalcPage },
+        { path: '/shared-calc/:id', component: SalaryCalcPage, name:'shared-calc' },
     ],
     mode: 'history',
 });

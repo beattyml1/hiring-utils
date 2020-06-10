@@ -23,5 +23,7 @@ export default class SalaryCalcBasePage extends BaseComponent {
     get experienceWeight() { return this.config && this.config.experienceWeight; }
     get positionWeight() { return this.config && this.config.positionWeight; }
     get stockDiscount() { return this.config && this.config.stockDiscount; }
+    get costOfLivingPerYear() { return this.config && this.config.costOfLivingPerYear; }
+    get costOfLivingCap() { return this.config && this.config.costOfLivingCap; }
     get hasConfig() { return !!this.config; }
 }

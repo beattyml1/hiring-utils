@@ -107,6 +107,21 @@
                 </label>
             </div>
         </fieldset>
+        <fieldset>
+            <legend>Cost of Living</legend>
+            <div class="row">
+                <label class="col col-sm-12 col-md-6">
+                    Max Cost of Living Adjustment Per Year of Tenure
+                    <input type="range" v-model="costOfLivingPerYear" required class="form-control" max=".2" min="0" step=".01" />
+                    <output>{{(costOfLivingPerYear*100).toFixed(0)}}%</output>
+                </label>
+                <label class="col col-sm-12 col-md-6">
+                    Absolute Max Cost of Living Adjustment
+                    <input type="range" v-model="costOfLivingCap" required class="form-control" max=".5" min="0" step=".05" />
+                    <output>{{(costOfLivingCap*100).toFixed(0)}}%</output>
+                </label>
+            </div>
+        </fieldset>
     </div>
 </template>
 
@@ -141,9 +156,14 @@
             valuation() { this.$emit('input', this.model); },
             vestingYears() { this.$emit('input', this.model); },
             defaultMarket() { this.$emit('input', this.model); },
+            defaultPosition() { this.$emit('input', this.model); },
             defaultStock() { this.$emit('input', this.model); },
+            costOfLivingPerYear() {this.$emit('input', this.model);},
+            costOfLivingCap() {this.$emit('input', this.model);},
             value() {
                 this.keys = this.value ? Object.keys(this.value) : this.keys||[]
+                if (!this.keys.includes('costOfLivingCap')) this.keys.push('costOfLivingCap')
+                if (!this.keys.includes('costOfLivingPerYear')) this.keys.push('costOfLivingPerYear')
                 Object.assign(this, this.value)
             },
         }
@@ -161,6 +181,8 @@
         valuation: number = defaults.valuation;
         vestingYears: number = defaults.vestingYears;
         defaultPosition: number|null = defaults.defaultPosition;
+        costOfLivingCap?: number = 0;
+        costOfLivingPerYear?: number = 0;
         publicId: string;
         keys: string[];
         @State user: User;

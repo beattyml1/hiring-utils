@@ -21,7 +21,7 @@ service cloud.firestore {
     }
 
     match /shared-calcs/{calc} {
-        allow read: if isOwnedByCurrentUser(resource.data) || resource.public || isSharedWithCurrentUser(resource.data);
+        allow read: if isOwnedByCurrentUser(resource.data) || resource.data.public || isSharedWithCurrentUser(resource.data);
         allow create: if isOwnedByCurrentUser(request.resource.data);
         allow update: if isOwnedByCurrentUser(request.resource.data) && isOwnedByCurrentUser(resource.data);
         allow delete: if isOwnedByCurrentUser(request.resource.data) && isOwnedByCurrentUser(resource.data);

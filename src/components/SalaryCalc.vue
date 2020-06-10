@@ -13,7 +13,7 @@
         </label>
 
         <label>
-            Position Applied for
+            Title
             <select class="form-control" v-model="position">
                 <option v-for="l in levels" :key="l.name" :value="l.start">{{l.name}}</option>
             </select>
@@ -37,6 +37,18 @@
                 <input type="text" readonly :value="`${(share*100).toFixed(2)}%`" class="form-control">
             </label>
         </div>
+        <details>
+            <summary>Cost of Living Adjustment</summary>
+            <label class="col col-sm-12">
+                Years Tenure
+                <input type="number" min="0" step="1" v-model="yearsTenure">
+            </label>
+            <label class="col col-sm-12">
+                Cost of Living Adjustment
+                <input type="range" min="0" step=".01" v-model="costOfLivingAdjustment" :max="maxCola">
+                <output>{{(costOfLivingAdjustment*100).toFixed(0)}}%</output>
+            </label>
+        </details>
         <label>
             Salary (USD)
             <input type="text" readonly :value="formatDollars(salary)" class="form-control">
@@ -55,6 +67,12 @@
     @Component({
         name: 'SalaryCalc',
         components: {ExperienceSlider},
+        // watch: {
+        //     position() {
+        //         if (this.stock < this.minStock) this.stock = this.minStock;
+        //         if (this.stock > this.maxStock) this.stock = this.maxStock;
+        //     }
+        // }
     })
     export default class SalaryCalc extends Vue {
 
@@ -69,6 +87,8 @@
         @Prop([Number,String]) experienceWeight: number
         @Prop([Number,String]) positionWeight: number
         @Prop([Number,String]) stockDiscount: number
+        @Prop([Number,String]) costOfLivingPerYear: number
+        @Prop([Number,String]) costOfLivingCap: number
 
         // @Watch('experienceCompInitial')
         // onExpCompChange() { this.market = this.experienceCompInitial; }
@@ -80,10 +100,13 @@
         market: number;
         position;
         stock: number;
+        yearsTenure = 0;
+        costOfLivingAdjustment = 0;
         data() {return {
             market: this.experienceCompInitial,
             position: this.positionCompInitial,
             stock: this.stockInitial,
+
         }}
         mounted() {
             this.position = 105000;
@@ -95,8 +118,13 @@
                 this.market
             );
         }
+        get maxCola() {
+            let tenureMax = this.yearsTenure * this.costOfLivingPerYear;
+            let hardMax = this.costOfLivingCap
+            return Math.min(tenureMax, hardMax);
+        }
         get salary() {
-            return this.compensation - this.stock * (1 - this.stockDiscount);
+            return (this.compensation - this.stock * (1 - this.stockDiscount)) * (1+ parseFloat(this.costOfLivingAdjustment));
         }
         get share() {
             return this.stock * this.vestingYears / (this.valuation);
@@ -114,7 +142,7 @@
         formatDollars(x) { return formatDollars(x) }
 
         level() {
-            return this.levels.find(l => l.start == this.position) || this.level[0];
+            return this.levels.find(l => l.start == this.position) || this.level[0] || {maxStock:0,minStock:0,fixedSalary:0};
         }
 
         @Watch('position')

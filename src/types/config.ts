@@ -39,6 +39,8 @@ export interface ConfigModel {
     defaultStock: number;
     defaultPosition: number|null;
     publicId: string;
+    costOfLivingPerYear: number;
+    costOfLivingCap: number;
     emails: string[]
 }
 
@@ -79,6 +81,8 @@ export function defaultConfigModel(): ConfigModel {
         showStock: true,
         name: '',
         publicId: '',
+        costOfLivingPerYear: 0,
+        costOfLivingCap: 0,
         emails: []
     };
 }

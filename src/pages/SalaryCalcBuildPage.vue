@@ -35,6 +35,8 @@
                         :experienceWeight = "experienceWeight"
                         :positionWeight = "positionWeight"
                         :stockDiscount = "stockDiscount"
+                        :costOfLivingPerYear = "costOfLivingPerYear"
+                        :costOfLivingCap = "costOfLivingCap"
                 ></salary-calc>
             </div>
         </div>
@@ -103,12 +105,13 @@
         // Save
         async saveNew() {
             let shareInfo = await this.saveSharing();
-            return await userData().collection(`/calcs`).add({...this.config, ...shareInfo});
+            return await userData().collection(`/calcs`).add({...this.config, ...shareInfo, uid: this.userId});
         }
 
         async saveExisting() {
+            console.log('saving:', this.id, {...this.config, ...shareInfo, uid: this.userId})
             let shareInfo = await this.saveSharing();
-            return await userData().collection(`/calcs`).doc(this.id).set({...this.config, ...shareInfo});
+            return await userData().collection(`/calcs`).doc(this.id).set({...this.config, ...shareInfo, uid: this.userId});
         }
 
         async saveSharing() {
@@ -120,7 +123,7 @@
         }
 
         private async savePublicSharing() {
-            let publicDoc = {...this.getShareableConfig(), public: this.sharing.isPublic, sharedWithEmail: null, ownerUser: this.userId };
+            let publicDoc = {...this.getShareableConfig(), public: this.sharing.isPublic, sharedWithEmail: null, ownerUser: this.userId, uid: this.userId };
             if (this.config.publicId) {
                 return await db.collection(`/shared-calcs`).doc(this.id).set(publicDoc).then(() => this.config.publicId);
             }
@@ -138,12 +141,15 @@
 
         async saveEmail(share: Share) {
             let sharedCollection = db.collection('shared-calcs');
-            let doc = {...this.getShareableConfig(), sharedWithEmail: share.email, public: false, ownerUser: this.userId }
+            let doc = {...this.getShareableConfig(), sharedWithEmail: share.email, public: false, ownerUser: this.userId, uid: this.userId }
             if (!share.id && !share.deleted) { // add
+                console.log('add share: ', doc)
                 return await sharedCollection.add(doc).then(d => d.id);
             } else if (share.id && !share.deleted) { // update
+                console.log('update share: ', share.id, doc)
                 return await sharedCollection.doc(share.id).set(doc).then(() => share.id);
             } else if (share.id && share.deleted) { // delete
+                console.log('update delete: ', share.id)
                 return await sharedCollection.doc(share.id).delete().then(() => null);
             }
         }

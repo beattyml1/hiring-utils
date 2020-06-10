@@ -2,7 +2,7 @@ import Vuex, {Store} from 'vuex';
 import * as _actions from '@/store/actions';
 import * as _getters from './getters';
 import * as _mutations from './mutations';
-import {names} from '@/types/names';
+import {actionsForStore, gettersForStore, names} from '@/types/names';
 import Vue from 'vue';
 import createPersist from 'vuex-localstorage'
 import {User} from "@/types/User";
@@ -33,4 +33,5 @@ Vue.prototype.$store = store;
 export const actions = names(_actions);
 export const getters = names(_getters);
 export const mutations = names(_mutations);
-
+export const dispatcher = actionsForStore(store, _actions);
+export const get = gettersForStore(store, _getters)

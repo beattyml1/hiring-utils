@@ -84,7 +84,7 @@
         }
 
         @Watch('emails')
-        publicChanged() {
+        emailsChanged() {
             this.$emit('input', {...this.value, emails: this.emails })
         }
         shareLink(shareId) {
@@ -92,6 +92,7 @@
         }
         removeEmail(share) {
             share.deleted = true;
+
         }
         addEmail() {
             if (!this.emails.some(share => share.email === this.emailToAdd))
